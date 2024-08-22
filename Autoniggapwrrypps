@@ -1,0 +1,83 @@
+-- Create the UI elements
+local ScreenGui = Instance.new("ScreenGui")
+local AutoParryButton = Instance.new("TextButton")
+local SpamButton = Instance.new("TextButton")
+
+-- Set up the ScreenGui properties
+ScreenGui.Name = "BladeBallGui"
+ScreenGui.Parent = game.CoreGui
+
+-- Set up the Auto Parry button properties
+AutoParryButton.Name = "AutoParryButton"
+AutoParryButton.Parent = ScreenGui
+AutoParryButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+AutoParryButton.BorderSizePixel = 0
+AutoParryButton.Position = UDim2.new(0.1, 0, 0.1, 0)
+AutoParryButton.Size = UDim2.new(0, 200, 0, 50)
+AutoParryButton.Font = Enum.Font.SourceSans
+AutoParryButton.Text = "Auto Parry: OFF"
+AutoParryButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+AutoParryButton.TextSize = 24
+
+-- Set up the Spam button properties
+SpamButton.Name = "SpamButton"
+SpamButton.Parent = ScreenGui
+SpamButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+SpamButton.BorderSizePixel = 0
+SpamButton.Position = UDim2.new(0.1, 0, 0.3, 0)
+SpamButton.Size = UDim2.new(0, 200, 0, 50)
+SpamButton.Font = Enum.Font.SourceSans
+SpamButton.Text = "Spam: OFF"
+SpamButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+SpamButton.TextSize = 24
+
+local autoParryEnabled = false
+local spamEnabled = false
+
+-- Auto Parry function
+local function autoParry()
+    local player = game.Players.LocalPlayer
+    local char = player.Character or player.CharacterAdded:Wait()
+    local hum = char:WaitForChild("HumanoidRootPart")
+
+    while autoParryEnabled do
+        for _, ball in pairs(workspace:GetChildren()) do
+            if ball:IsA("Part") and (ball.Position - hum.Position).Magnitude < 10 then
+                -- Trigger parry (replace this with your actual parry logic)
+                game:GetService("VirtualInputManager"):SendKeyEvent(true, "F", false, game)
+                wait(0.1)  -- Adjust the delay as needed
+                game:GetService("VirtualInputManager"):SendKeyEvent(false, "F", false, game)
+            end
+        end
+        wait(0.1)  -- Check every 0.1 seconds
+    end
+end
+
+-- Spam function
+local function spamF()
+    while spamEnabled do
+        game:GetService("VirtualInputManager"):SendKeyEvent(true, "F", false, game)
+        wait(0.05)  -- Adjust the delay as needed
+        game:GetService("VirtualInputManager"):SendKeyEvent(false, "F", false, game)
+    end
+end
+
+-- Toggle Auto Parry button
+AutoParryButton.MouseButton1Click:Connect(function()
+    autoParryEnabled = not autoParryEnabled
+    AutoParryButton.Text = "Auto Parry: " .. (autoParryEnabled and "ON" or "OFF")
+
+    if autoParryEnabled then
+        spawn(autoParry)
+    end
+end)
+
+-- Toggle Spam button
+SpamButton.MouseButton1Click:Connect(function()
+    spamEnabled = not spamEnabled
+    SpamButton.Text = "Spam: " .. (spamEnabled and "ON" or "OFF")
+
+    if spamEnabled then
+        spawn(spamF)
+    end
+end)
